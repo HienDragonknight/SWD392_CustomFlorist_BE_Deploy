@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e3f2fd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+            border: 2px solid #90caf9;
+        }
+        h2 {
+            color: #1565c0;
+        }
+        .info {
+            text-align: left;
+            margin-top: 15px;
+            padding: 10px;
+            background: #f1f8ff;
+            border-radius: 8px;
+        }
+        .info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #64b5f6;
+            margin-bottom: 10px;
+        }
+        .logout-btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #1976d2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Login successful!</h2>
+    <img class="profile-pic" th:src="${user.attributes['picture']}" alt="Ảnh đại diện">
+    <div class="info">
+        <p><strong>Tên:</strong> <span th:text="${user.name}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${user.attributes['email']}"></span></p>
+        <p><strong>ID:</strong> <span th:text="${user.attributes['sub']}"></span></p>
+        <p><strong>Locale:</strong> <span th:text="${user.attributes['locale']}"></span></p>
+    </div>
+    <a class="logout-btn" href="/logout">Logout</a>
+</div>
+</body>
+</html>

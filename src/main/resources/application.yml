@@ -1,0 +1,80 @@
+server:
+  application:
+    name: custom_florist
+  port: 8080
+spring:
+  datasource:
+    url: ${DBMS_CONNECTION:jdbc:mysql://flouristmysql.mysql.database.azure.com/swd392_custom_florist}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DBMS_USERNAME:saadmin}
+    password: ${DBMS_PASSWORD:Flouristmysql@@}
+  jpa:
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        order_inserts: true
+        order_updates: true
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 10
+  security:
+    oauth2:
+      resourceserver:
+        opaque-token:
+          introspection-uri: https://www.googleapis.com/
+          clientId: ${GOOGLE_OAUTH2_CLIENT_ID:833352017043-3bd6ieqdukrkggbb7vo3acb8mmqh6oua.apps.googleusercontent.com}
+          clientSecret: ${GOOGLE_OAUTH2_CLIENT_SECRET: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}
+  mail:
+    host: ${MAIL_HOST:smtp-relay.brevo.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:86e661001@smtp-brevo.com}
+    password: ${MAIL_PASSWORD:L3TydZJVxUjQcGmt}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+api:
+  prefix: /custom-florist
+jwt:
+  expiration: 2592000 #30 days = 30 * 24 * 60 * 60
+  expiration-refresh-token: 5184000 #60 days = 60 * 24 * 60 * 60
+  secretKey: ${JWT_SECRET_KEY:U3t9aQv9tqdw/mwvxDrl4ebJKiurzORBmS1gzYKDeT+zJOTg0xAauB7HpLCYasbo}
+open:
+  api:
+    title: Custom Florist API
+    version: 1.0.0
+    description: Meta API service
+#    serverUrl: https://custom-florist.onrender.com
+    serverUrl: http://localhost:8080
+    serverName: server test
+payment:
+  vnpay:
+    url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    returnUrl: https://custom-florist.onrender.com/custom-florist/api/v1/payment/vn-pay-callback
+    tmnCode: ${VNPAY_TMN_CODE:07IVPW62}
+    secretKey: ${VNPAY_SECRET_KEY:6LGP36DS9S6IYW5R523GNZRK9E6X7216}
+    version: 2.1.0
+    command: pay
+    orderType: Flower
+firebase:
+  storage:
+    bucket: swd392-customflorist.firebasestorage.app
+image:
+  base:
+    url: https://firebasestorage.googleapis.com/v0/b/swd392-customflorist.firebasestorage.app/o/
+# OpenAI API configuration
+openai:
+  api:
+    key: "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"
+    url: https://api.openai.com/v1/chat/completions
+  model: gpt-3.5-turbo
+google:
+  api:
+    key: AIzaSyCkR74gqOW2JBLlL3Njy0fr0D7JxEyf8LI
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
