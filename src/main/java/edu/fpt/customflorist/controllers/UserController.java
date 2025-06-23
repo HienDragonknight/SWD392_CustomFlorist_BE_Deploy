@@ -11,6 +11,7 @@ import edu.fpt.customflorist.responses.User.CustomerResponse;
 import edu.fpt.customflorist.services.User.IUserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -265,6 +266,31 @@ public class UserController {
                     .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
+    @Operation(
+        summary = "Update current user's profile",
+        description = "Update the personal information of the currently logged-in user. Requires Authorization header with Bearer token."
+    )
+    @PutMapping("/me")
+    public ResponseEntity<?> updateCurrentUserProfile(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody UpdateUserDTO updateUserDTO) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(401).body("Missing or invalid Authorization header");
+            }
+            String token = authHeader.substring(7);
+            User user = userService.getUserDetailsFromToken(token);
+            User updatedUser = userService.updateUser(user.getUserId(), updateUserDTO);
+            return ResponseEntity.ok(ResponseObject.builder()
+                    .message("User profile updated successfully")
+                    .data(CustomerResponse.fromUser(updatedUser))
+                    .status(HttpStatus.OK)
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }
