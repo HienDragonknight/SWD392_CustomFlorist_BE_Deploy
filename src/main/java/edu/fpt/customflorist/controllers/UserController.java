@@ -249,4 +249,22 @@ public class UserController {
             );
         }
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUserProfile(@RequestHeader("Authorization") String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(401).body("Missing or invalid Authorization header");
+            }
+            String token = authHeader.substring(7);
+            User user = userService.getUserDetailsFromToken(token);
+            return ResponseEntity.ok(ResponseObject.builder()
+                    .message("Fetch current user profile successfully")
+                    .data(CustomerResponse.fromUser(user))
+                    .status(HttpStatus.OK)
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
 }
