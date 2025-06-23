@@ -50,7 +50,7 @@ open:
     title: Custom Florist API
     version: 1.0.0
     description: Meta API service
-    serverUrl: https://flourist-gkf7c9aefxcxb4ck.eastasia-01.azurewebsites.net/custom-florist
+    serverUrl: https://flourist-gkf7c9aefxcxb4ck.eastasia-01.azurewebsites.net
     serverName: server test
 payment:
   vnpay:
