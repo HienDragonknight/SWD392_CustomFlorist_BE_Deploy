@@ -55,8 +55,6 @@ public class UserService implements IUserService {
             throw new DataIntegrityViolationException("Phone number already exists");
         }
 
-        String verificationCode = UUID.randomUUID().toString();
-
         //convert from userDTO => user
         User newUser = User.builder()
                 .password(userDTO.getPassword())
@@ -68,8 +66,7 @@ public class UserService implements IUserService {
                 .gender(Gender.valueOf(userDTO.getGender()))
                 .accountStatus(accountStatusDefault)
                 .role(roleDefault)
-                .verificationCode(verificationCode)
-                .isVerified(false)
+                .isVerified(true) // Immediately mark as verified
                 .build();
 
         String password = userDTO.getPassword();
@@ -77,7 +74,7 @@ public class UserService implements IUserService {
         newUser.setPassword(encodedPassword);
         userRepository.save(newUser);
 
-        emailService.sendVerificationEmail(newUser);
+        // Removed: emailService.sendVerificationEmail(newUser);
 
         return newUser;
     }
@@ -144,7 +141,7 @@ public class UserService implements IUserService {
                 + "<p>Hi " + user.getName() + ",</p>"
                 + "<p>We received a request to reset your password. Click the link below to reset it:</p>"
                 + "<a href='" + resetLink + "' class='link'>Reset Password</a>"
-                + "<p>If you didn’t request a password reset, please ignore this email.</p>"
+                + "<p>If you didn't request a password reset, please ignore this email.</p>"
                 + "<p class='team'>Best regards,<br>Custom Florist Team</p>"
                 + "</div>"
                 + "</body>"
