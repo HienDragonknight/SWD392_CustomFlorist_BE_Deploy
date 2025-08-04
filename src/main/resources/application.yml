@@ -67,6 +67,12 @@ firebase:
 image:
   base:
     url: https://firebasestorage.googleapis.com/v0/b/swd392-customflorist.firebasestorage.app/o/
+
+
+cloudinary:
+      cloud-name: dzsrpbetu
+      api-key: 229199421581385
+      api-secret: 8gvn6oMxAUe7efM7VYRGq2OoCMg # Thay bằng API Secret đầy đủ
 # OpenAI API configuration
 openai:
   api:
