@@ -12,6 +12,8 @@ import edu.fpt.customflorist.models.Enums.Status;
 import edu.fpt.customflorist.repositories.OrderRepository;
 import edu.fpt.customflorist.repositories.PaymentRepository;
 import edu.fpt.customflorist.repositories.PromotionManagerRepository;
+import edu.fpt.customflorist.repositories.UserRepository;
+import edu.fpt.customflorist.utils.UserUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -41,6 +43,7 @@ public class PaymentService implements IPaymentService{
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
     private final RandomStringGenerator randomStringGenerator;
+    private final UserRepository userRepository;
     private final PromotionManagerRepository promotionManagerRepository;
     private final PayOsConfig payOsConfig;
 
@@ -77,6 +80,8 @@ public class PaymentService implements IPaymentService{
     }
 
     public CheckoutResponseData createPayOsPayment(HttpServletRequest request, PaymentDTO paymentDTO) throws Exception {
+        Long userId = UserUtil.getCurrentUserId();
+        User user = userRepository.findByUserId(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
         try {
             Order order = orderRepository.findById(paymentDTO.getOrderId())
                     .orElseThrow(() -> new DataNotFoundException("Order not found"));
@@ -103,10 +108,10 @@ public class PaymentService implements IPaymentService{
                     .cancelUrl(cancelUrl)
                     .returnUrl(returnUrl)
                     .signature(signature)
-                    .buyerName("Cuong")
-                    .buyerEmail("tranquoccuong0179@gmail.com")
-                    .buyerPhone("0363919179")
-                    .buyerAddress("PT-BT")
+                    .buyerName(user.getName())
+                    .buyerEmail(user.getEmail())
+                    .buyerPhone(user.getPhone())
+                    .buyerAddress(user.getAddress())
                     .expiredAt((System.currentTimeMillis() / 1000 + 10 * 60))
                     .build();
 
