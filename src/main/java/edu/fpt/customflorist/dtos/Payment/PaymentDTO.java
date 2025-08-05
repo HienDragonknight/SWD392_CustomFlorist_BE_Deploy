@@ -13,13 +13,6 @@ import lombok.*;
 @Getter
 @Setter
 public class PaymentDTO {
-    @Min(value = 5000, message = "Price must be greater than or equal to 5000")
-    private float finalAmount;
-
-    @NotEmpty(message = "Bank code is required")
-    @Schema(description = "Bank code for the transaction", example = "VNBANK")
-    private String bankCode;
-
     @NotNull(message = "orderId is required")
     private Long orderId;
 }

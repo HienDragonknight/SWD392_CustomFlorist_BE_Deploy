@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
+import vn.payos.type.CheckoutResponseData;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,22 +34,18 @@ import java.time.LocalDateTime;
 public class PaymentController {
     private final IPaymentService paymentService;
 
-    @PostMapping("/vn-pay")
+    @PostMapping()
     public ResponseEntity<?> pay(
             HttpServletRequest request,
             @Valid @RequestBody PaymentDTO paymentDTO,
             BindingResult result
-    ) throws DataNotFoundException {
+    ) throws Exception {
 
-        String vnpayResponse = paymentService.createVnPayPayment(request, paymentDTO);
+        CheckoutResponseData response = paymentService.createPayOsPayment(request, paymentDTO);
         return ResponseEntity.ok(ResponseObject.builder()
                 .message("Payment page")
                 .status(HttpStatus.OK)
-                .data(VnpayResponse.builder()
-                        .code(paymentDTO.getBankCode())
-                        .orderId(paymentDTO.getOrderId().toString())
-                        .paymentUrl(vnpayResponse)
-                        .build())
+                .data(response)
                 .build());
     }
 

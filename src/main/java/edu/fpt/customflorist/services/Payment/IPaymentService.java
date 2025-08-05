@@ -8,12 +8,13 @@ import edu.fpt.customflorist.responses.Payment.VnpayResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import vn.payos.type.CheckoutResponseData;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public interface IPaymentService {
-    String createVnPayPayment(HttpServletRequest request, PaymentDTO paymentDTO) throws DataNotFoundException;
+    CheckoutResponseData createPayOsPayment(HttpServletRequest request, PaymentDTO paymentDTO) throws Exception;
     void updatePayment(Long orderId, String statusPayment) throws DataNotFoundException;
     Page<Payment> getAllPayments(Pageable pageable, String status, LocalDateTime fromDate, LocalDateTime toDate, BigDecimal minAmount, BigDecimal maxAmount);
 

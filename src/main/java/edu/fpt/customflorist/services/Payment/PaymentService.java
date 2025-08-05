@@ -1,7 +1,7 @@
 package edu.fpt.customflorist.services.Payment;
 
 import edu.fpt.customflorist.components.RandomStringGenerator;
-import edu.fpt.customflorist.components.VnpayUtil;
+import edu.fpt.customflorist.configurations.PayOsConfig;
 import edu.fpt.customflorist.configurations.VnpayConfig;
 import edu.fpt.customflorist.dtos.Payment.PaymentDTO;
 import edu.fpt.customflorist.exceptions.DataNotFoundException;
@@ -12,26 +12,37 @@ import edu.fpt.customflorist.models.Enums.Status;
 import edu.fpt.customflorist.repositories.OrderRepository;
 import edu.fpt.customflorist.repositories.PaymentRepository;
 import edu.fpt.customflorist.repositories.PromotionManagerRepository;
-import edu.fpt.customflorist.responses.Payment.VnpayResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import vn.payos.PayOS;
+import vn.payos.exception.PayOSException;
+import vn.payos.type.CheckoutResponseData;
+import vn.payos.type.PaymentData;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService implements IPaymentService{
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
+
     private final VnpayConfig vnPayConfig;
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
     private final RandomStringGenerator randomStringGenerator;
     private final PromotionManagerRepository promotionManagerRepository;
+    private final PayOsConfig payOsConfig;
 
     @Override
     public Page<Payment> getAllPayments(Pageable pageable, String statusStr, LocalDateTime fromDate, LocalDateTime toDate, BigDecimal minAmount, BigDecimal maxAmount) {
@@ -46,39 +57,88 @@ public class PaymentService implements IPaymentService{
         return paymentRepository.findAllWithFilters(status, fromDate, toDate, minAmount, maxAmount, pageable);
     }
 
-    @Override
-    public String createVnPayPayment(HttpServletRequest request, PaymentDTO paymentDTO) throws DataNotFoundException {
-        long amount = (int)paymentDTO.getFinalAmount() * 100L;
-        String bankCode = paymentDTO.getBankCode();
-        Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
-        vnpParamsMap.put("vnp_Amount", String.valueOf(amount));
-        vnpParamsMap.put("vnp_OrderInfo", paymentDTO.getOrderId() + "");
-        if (bankCode != null && !bankCode.isEmpty()) {
-            vnpParamsMap.put("vnp_BankCode", bankCode);
+    private String generateSignature(long orderCode, int amount, String description, String returnUrl, String cancelUrl, String checksumKey) throws Exception {
+        String rawData = String.format("amount=%d&cancelUrl=%s&description=%s&orderCode=%d&returnUrl=%s",
+                amount, cancelUrl, description, orderCode, returnUrl);
+
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secret_key = new SecretKeySpec(checksumKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        sha256_HMAC.init(secret_key);
+        byte[] hashBytes = sha256_HMAC.doFinal(rawData.getBytes(StandardCharsets.UTF_8));
+
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hashBytes) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
         }
-        vnpParamsMap.put("vnp_IpAddr", VnpayUtil.getIpAddress(request));
-        //build query url
-        String queryUrl = VnpayUtil.getPaymentURL(vnpParamsMap, true);
-        String hashData = VnpayUtil.getPaymentURL(vnpParamsMap, false);
-        String vnpSecureHash = VnpayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
-        queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
-        String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
+        String signature = hexString.toString().toLowerCase();
+        return signature;
+    }
 
-        if (!paymentRepository.existsByOrderId(paymentDTO.getOrderId())){
-            Payment payment = new Payment();
-            Order order = orderRepository.findById(paymentDTO.getOrderId()).orElseThrow(()-> new DataNotFoundException("order not found"));
-            payment.setOrder(order);
-            payment.setAmount(BigDecimal.valueOf(paymentDTO.getFinalAmount()));
-            payment.setPaymentMethod(PaymentMethod.VNPAY);
-            payment.setPaymentDate(LocalDateTime.now());
-            payment.setStatus(PaymentStatus.PENDING);
-            payment.setIsActive(true);
-            payment.setTransactionCode(randomStringGenerator.generateRandomString(20));
+    public CheckoutResponseData createPayOsPayment(HttpServletRequest request, PaymentDTO paymentDTO) throws Exception {
+        try {
+            Order order = orderRepository.findById(paymentDTO.getOrderId())
+                    .orElseThrow(() -> new DataNotFoundException("Order not found"));
 
-            paymentRepository.save(payment);
+            PayOS payOS = new PayOS(
+                    payOsConfig.getClientId(),
+                    payOsConfig.getApiKey(),
+                    payOsConfig.getChecksumKey()
+            );
+
+            long orderCode = 100000 + new Random().nextInt(900000);
+            int amount = order.getTotalPrice().intValue();
+            String description = "Đơn hàng " + orderCode;
+            String cancelUrl = payOsConfig.getCancelUrl();
+            String returnUrl = payOsConfig.getReturnUrl();
+            String checksumKey = payOsConfig.getChecksumKey();
+
+            String signature = generateSignature(orderCode, amount, description, returnUrl, cancelUrl, checksumKey);
+
+            PaymentData paymentData = PaymentData.builder()
+                    .orderCode(orderCode)
+                    .amount(amount)
+                    .description(description)
+                    .cancelUrl(cancelUrl)
+                    .returnUrl(returnUrl)
+                    .signature(signature)
+                    .buyerName("Cuong")
+                    .buyerEmail("tranquoccuong0179@gmail.com")
+                    .buyerPhone("0363919179")
+                    .buyerAddress("PT-BT")
+                    .expiredAt((System.currentTimeMillis() / 1000 + 10 * 60))
+                    .build();
+
+            CheckoutResponseData response;
+            try {
+                response = payOS.createPaymentLink(paymentData);
+
+            } catch (Exception targetException) {
+                if (targetException instanceof PayOSException payOSException) {
+                    throw payOSException;
+                } else {
+                    throw targetException;
+                }
+            }
+
+            if (!paymentRepository.existsByOrderId(paymentDTO.getOrderId())) {
+                Payment payment = new Payment();
+                payment.setAmount(order.getTotalPrice());
+                payment.setOrder(order);
+                payment.setPaymentDate(LocalDateTime.now());
+                payment.setStatus(PaymentStatus.PENDING);
+                payment.setIsActive(true);
+                payment.setPaymentMethod(PaymentMethod.BANK);
+                payment.setTransactionCode(String.valueOf(orderCode));
+                paymentRepository.save(payment);
+            }
+
+            return response;
+        } catch (Exception ex) {
+            logger.error("Lỗi trong createPayOsPayment: {}", ex.getMessage(), ex);
+            throw ex;
         }
-
-        return paymentUrl;
     }
 
     @Override

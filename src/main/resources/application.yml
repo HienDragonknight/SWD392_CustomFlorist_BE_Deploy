@@ -77,3 +77,10 @@ google:
   api:
     key: AIzaSyCkR74gqOW2JBLlL3Njy0fr0D7JxEyf8LI
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+PayOS:
+  client-id: 11cb5f21-c773-4ade-a059-bc0b4f54ca5b
+  api-key: f17566c7-9bf2-4e4b-b1f5-1c6da8348977
+  checksum-key: 14c6e47012d01fc3388bd62a2d19859499a020db7f724f1926aea2524177fd0a
+  url: https://api.payos.vn/v1/payments
+  return-url: http://localhost:8080/return-url
+  cancel-url: http://localhost:8080/cancel-url
