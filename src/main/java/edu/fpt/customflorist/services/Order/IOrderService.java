@@ -19,21 +19,23 @@ import java.time.LocalDateTime;
 public interface IOrderService {
     Order createOrder(OrderDTO orderDTO) throws DataNotFoundException;
     void updateOrder(Long orderId, OrderUpdateDTO status) throws DataNotFoundException;
+    void confirmOrder(Long orderId, OrderUpdateDTO status) throws DataNotFoundException;
+
     void deleteOrder(Long orderId) throws DataNotFoundException;
     Order getOrderById(Long orderId) throws DataNotFoundException;
     Page<Order> getAllOrdersActive(Long userId, LocalDateTime minOrderDate,
-                             LocalDateTime maxOrderDate,
-                             BigDecimal minPrice,
-                             BigDecimal maxPrice,
-                             String status,
-                             Pageable pageable);
-    Page<Order> getAllOrdersActiveFoDelivery(LocalDateTime minOrderDate,
                                    LocalDateTime maxOrderDate,
                                    BigDecimal minPrice,
                                    BigDecimal maxPrice,
                                    String status,
-                                             String customerName,
                                    Pageable pageable);
+    Page<Order> getAllOrdersActiveFoDelivery(LocalDateTime minOrderDate,
+                                             LocalDateTime maxOrderDate,
+                                             BigDecimal minPrice,
+                                             BigDecimal maxPrice,
+                                             String status,
+                                             String customerName,
+                                             Pageable pageable);
     Page<Order> getAllOrders(LocalDateTime minOrderDate,
                              LocalDateTime maxOrderDate,
                              BigDecimal minPrice,
