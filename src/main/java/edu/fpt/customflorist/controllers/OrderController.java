@@ -95,6 +95,41 @@ public class OrderController {
         }
     }
 
+
+    @PatchMapping("/{orderId}/customer-confirm-status")
+    public ResponseEntity<?> customerConfirmOrderStatus(@PathVariable Long orderId, @RequestBody OrderUpdateDTO status) {
+        try {
+            orderService.confirmOrder(orderId, status);
+            return ResponseEntity.ok().body(
+                    ResponseObject.builder()
+                            .message("Order status updated successfully")
+                            .status(HttpStatus.OK)
+                            .build()
+            );
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ResponseObject.builder()
+                            .message(e.getMessage())
+                            .status(HttpStatus.NOT_FOUND)
+                            .build()
+            );
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ResponseObject.builder()
+                            .message(e.getMessage())
+                            .status(HttpStatus.BAD_REQUEST)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(
+                    ResponseObject.builder()
+                            .message("Error updating order status: " + e.getMessage())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .build()
+            );
+        }
+    }
+
     @DeleteMapping("/{orderId}")
     public ResponseEntity<?> deleteOrder(@PathVariable Long orderId) {
         try {

@@ -116,6 +116,23 @@ public class OrderService implements IOrderService{
         orderRepository.save(order);
     }
 
+    @Override
+    public void confirmOrder(Long orderId, OrderUpdateDTO status) throws DataNotFoundException {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new DataNotFoundException("Order not found"));
+
+        if (order.getStatus() == Status.DELIVERED || order.getStatus() == Status.CANCELLED) {
+            throw new IllegalStateException("Cannot update order as it is already " + order.getStatus());
+        }
+
+        if (status.getStatus() == Status.CANCELLED) {
+            order.setReason(status.getReason());
+        }
+
+        order.setStatus(status.getStatus());
+        orderRepository.save(order);
+    }
+
 
     @Override
     public void deleteOrder(Long orderId) throws DataNotFoundException {
