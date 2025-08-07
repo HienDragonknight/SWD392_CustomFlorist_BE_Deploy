@@ -18,8 +18,8 @@ public class SwaggerApiConfig {
     public OpenAPI openAPI(@Value("${open.api.title}") String title,
                            @Value("${open.api.version}") String version,
                            @Value("${open.api.description}") String description,
-//                           @Value("${open.api.serverUrl}") String serverUrl,
-                           @Value("http://localhost:8080") String serverUrl,
+                           @Value("${open.api.serverUrl}") String serverUrl,
+                           // @Value("http://localhost:8080") String serverUrl,
                            @Value("${open.api.serverName}") String serverName){
         return new OpenAPI().info(new Info().title(title).
                         version(version).description(description)
