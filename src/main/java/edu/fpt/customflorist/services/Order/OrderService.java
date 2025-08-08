@@ -239,5 +239,15 @@ public class OrderService implements IOrderService{
     public DeliveryStatusHistoryResponse convertToDeliveryStatusHistoryResponse(DeliveryStatusHistory data) {
         return DeliveryStatusHistoryResponse.fromEntity(data);
     }
+    @Override
+    public BigDecimal getTotalDeliveredLast12Months() {
+        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate = endDate.minusMonths(11)
+                .withDayOfMonth(1)
+                .withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+        return orderRepository.getTotalRevenueByStatusAndDateRange(Status.DELIVERED, startDate, endDate);
+    }
+
 
 }

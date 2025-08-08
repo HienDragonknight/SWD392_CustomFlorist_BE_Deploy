@@ -132,4 +132,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             Pageable pageable
     );
 
+    @Query("SELECT COALESCE(SUM(o.totalPrice), 0) " +
+            "FROM Order o " +
+            "WHERE o.status = :status AND o.orderDate BETWEEN :startDate AND :endDate")
+    BigDecimal getTotalRevenueByStatusAndDateRange(@Param("status") Status status,
+                                                   @Param("startDate") LocalDateTime startDate,
+                                                   @Param("endDate") LocalDateTime endDate);
+
 }

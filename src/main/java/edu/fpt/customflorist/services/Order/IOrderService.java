@@ -49,4 +49,7 @@ public interface IOrderService {
     OrderResponse convertToOrderResponse(Order order);
     OrderItemResponse convertToOrderItemResponse(OrderItem orderItem);
     OrderBouquetFlowerResponse convertToOrderBouquetFlowerResponse(OrderBouquetFlower obf);
+
+    BigDecimal getTotalDeliveredLast12Months();
+
 }

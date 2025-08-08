@@ -299,4 +299,26 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/stats/total-delivered-last-12-months")
+    public ResponseEntity<?> getTotalDeliveredLast12Months() {
+        try {
+            BigDecimal total = orderService.getTotalDeliveredLast12Months();
+            return ResponseEntity.ok(
+                    ResponseObject.builder()
+                            .message("Total revenue of DELIVERED orders in the last 12 months")
+                            .data(total)
+                            .status(HttpStatus.OK)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(
+                    ResponseObject.builder()
+                            .message("Error: " + e.getMessage())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .build()
+            );
+        }
+    }
+
+
 }

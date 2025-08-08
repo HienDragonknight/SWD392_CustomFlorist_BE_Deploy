@@ -63,7 +63,7 @@ payment:
     orderType: Flower
 firebase:
   storage:
-    bucket: swd392-customflorist.firebasestorage.app
+
 image:
   base:
     url: https://firebasestorage.googleapis.com/v0/b/swd392-customflorist.firebasestorage.app/o/
