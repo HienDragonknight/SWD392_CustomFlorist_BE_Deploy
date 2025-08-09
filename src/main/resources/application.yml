@@ -26,8 +26,8 @@ spring:
       resourceserver:
         opaque-token:
           introspection-uri: https://www.googleapis.com/
-          clientId: ${GOOGLE_OAUTH2_CLIENT_ID:833352017043-3bd6ieqdukrkggbb7vo3acb8mmqh6oua.apps.googleusercontent.com}
-          clientSecret: ${GOOGLE_OAUTH2_CLIENT_SECRET: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}
+          clientId: ${GOOGLE_OAUTH2_CLIENT_ID:416201851875-bn60ab22q5skeja21uapon5jeohvrl50.apps.googleusercontent.com}
+          clientSecret: ${GOOGLE_OAUTH2_CLIENT_SECRET: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}
   mail:
     host: ${MAIL_HOST:smtp-relay.brevo.com}
     port: ${MAIL_PORT:587}
