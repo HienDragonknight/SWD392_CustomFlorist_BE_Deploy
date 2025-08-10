@@ -1,6 +1,6 @@
 package edu.fpt.customflorist.services.Category;
 
-import edu.fpt.customflorist.dtos.Category.CategoryDTO;
+import edu.fpt.customflorist.dtos.Category.*;
 import edu.fpt.customflorist.models.Category;
 import edu.fpt.customflorist.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class CategoryService implements ICategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public Category createCategory(CategoryDTO categoryDTO) throws Exception {
+    public Category createCategory(CreateCategoryDTO categoryDTO) throws Exception {
         if (categoryRepository.findByNameContaining(categoryDTO.getName(), Pageable.unpaged()).hasContent()) {
             throw new Exception("Category with this name already exists");
         }

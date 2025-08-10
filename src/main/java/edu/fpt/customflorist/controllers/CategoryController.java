@@ -1,6 +1,7 @@
 package edu.fpt.customflorist.controllers;
 
 import edu.fpt.customflorist.dtos.Category.CategoryDTO;
+import edu.fpt.customflorist.dtos.Category.CreateCategoryDTO;
 import edu.fpt.customflorist.models.Category;
 import edu.fpt.customflorist.responses.Category.CategoryResponse;
 import edu.fpt.customflorist.responses.ResponseObject;
@@ -26,7 +27,7 @@ public class CategoryController {
     private final ICategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<ResponseObject> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
+    public ResponseEntity<ResponseObject> createCategory(@Valid @RequestBody CreateCategoryDTO categoryDTO) {
         try {
             Category category = categoryService.createCategory(categoryDTO);
             return ResponseEntity.ok(
