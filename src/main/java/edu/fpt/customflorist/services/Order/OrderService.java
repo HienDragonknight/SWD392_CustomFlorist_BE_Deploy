@@ -240,13 +240,29 @@ public class OrderService implements IOrderService{
         return DeliveryStatusHistoryResponse.fromEntity(data);
     }
     @Override
-    public BigDecimal getTotalDeliveredLast12Months() {
+    public List<Map<String, Object>> getDeliveredOrderStatsLast12Months() {
         LocalDateTime endDate = LocalDateTime.now();
         LocalDateTime startDate = endDate.minusMonths(11)
                 .withDayOfMonth(1)
                 .withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        return orderRepository.getTotalRevenueByStatusAndDateRange(Status.DELIVERED, startDate, endDate);
+        List<Object[]> rawData = orderRepository.getMonthlyOrderCountByStatus(
+                Status.DELIVERED, startDate, endDate
+        );
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Object[] row : rawData) {
+            Integer year = (Integer) row[0];
+            Integer month = (Integer) row[1];
+            Long totalOrders = (Long) row[2];
+
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("thang", month + "/" + year);
+            map.put("soDonDelivered", totalOrders);
+            result.add(map);
+        }
+
+        return result;
     }
 
 

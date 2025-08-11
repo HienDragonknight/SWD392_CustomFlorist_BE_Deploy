@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("${api.prefix}/api/v1/orders")
@@ -299,14 +300,14 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/stats/total-delivered-last-12-months")
-    public ResponseEntity<?> getTotalDeliveredLast12Months() {
+    @GetMapping("/stats/delivered-orders-last-12-months")
+    public ResponseEntity<?> getDeliveredOrderStatsLast12Months() {
         try {
-            BigDecimal total = orderService.getTotalDeliveredLast12Months();
+            List<Map<String, Object>> stats = orderService.getDeliveredOrderStatsLast12Months();
             return ResponseEntity.ok(
                     ResponseObject.builder()
-                            .message("Total revenue of DELIVERED orders in the last 12 months")
-                            .data(total)
+                            .message("Số đơn DELIVERED trong 12 tháng gần nhất")
+                            .data(stats)
                             .status(HttpStatus.OK)
                             .build()
             );
