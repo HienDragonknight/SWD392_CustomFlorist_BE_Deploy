@@ -46,4 +46,18 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             @Param("minAmount") BigDecimal minAmount,
             @Param("maxAmount") BigDecimal maxAmount,
             Pageable pageable);
+
+    @Query("""
+    SELECT MONTH(p.paymentDate) AS month,
+           YEAR(p.paymentDate) AS year,
+           COALESCE(SUM(p.amount), 0)
+    FROM Payment p
+    WHERE p.status = 'COMPLETED'
+      AND p.paymentDate >= :startDate
+    GROUP BY YEAR(p.paymentDate), MONTH(p.paymentDate)
+    ORDER BY YEAR(p.paymentDate), MONTH(p.paymentDate)
+    """)
+    List<Object[]> getDashboardAmounts(@Param("startDate") LocalDateTime startDate);
+
+    Optional<Payment> findByTransactionCode(String transactionCode);
 }

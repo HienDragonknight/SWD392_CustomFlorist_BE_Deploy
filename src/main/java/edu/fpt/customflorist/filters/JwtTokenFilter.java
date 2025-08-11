@@ -130,8 +130,11 @@ public class JwtTokenFilter extends OncePerRequestFilter{
 
                 //promotion
                 Pair.of(String.format("%s/api/v1/promotions/active", apiPrefix), "GET"),
-                Pair.of(String.format("%s/api/v1/promotions/active", apiPrefix), "OPTIONS")
+                Pair.of(String.format("%s/api/v1/promotions/active", apiPrefix), "OPTIONS"),
 
+                Pair.of(String.format("%s/api/v1/dashboard/amount", apiPrefix), "GET"),
+
+                Pair.of(String.format("%s/api/v1/payment/handle", apiPrefix), "GET")
                 //chatbot
 //                Pair.of(String.format("%s/api/v1/chatbot/message", apiPrefix), "POST"),
 //                Pair.of(String.format("%s/api/v1/chatbot/message", apiPrefix), "OPTIONS"),

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 public interface IPaymentService {
     CheckoutResponseData createPayOsPayment(HttpServletRequest request, PaymentDTO paymentDTO) throws Exception;
-    void updatePayment(Long orderId, String statusPayment) throws DataNotFoundException;
+    void updatePayment(Long orderCode, PaymentStatus status) throws DataNotFoundException;
     Page<Payment> getAllPayments(Pageable pageable, String status, LocalDateTime fromDate, LocalDateTime toDate, BigDecimal minAmount, BigDecimal maxAmount);
 
 }

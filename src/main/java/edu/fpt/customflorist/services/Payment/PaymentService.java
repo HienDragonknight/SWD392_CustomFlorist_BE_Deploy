@@ -147,36 +147,12 @@ public class PaymentService implements IPaymentService{
     }
 
     @Override
-    public void updatePayment(Long orderId, String statusPayment) throws DataNotFoundException {
-        Order order = orderRepository.findById(orderId).orElseThrow(()-> new DataNotFoundException("order not found"));
-        order.setStatus(Status.PROCESSING);
-        orderRepository.save(order);
+    public void updatePayment(Long orderCode, PaymentStatus status) throws DataNotFoundException {
+        Payment payment = paymentRepository.findByTransactionCode(String.valueOf(orderCode))
+                .orElseThrow(() -> new DataNotFoundException("Payment not found"));
 
-        Payment payment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new DataNotFoundException("payment not found for orderId: " + orderId));
-        payment.setStatus(PaymentStatus.valueOf(statusPayment));
+        payment.setStatus(status);
         paymentRepository.save(payment);
 
-        if (order.getPromotion() != null) {
-            User user = order.getUser();
-            Promotion promotion = order.getPromotion();
-
-            Optional<PromotionManager> promotionManagerOpt = promotionManagerRepository
-                    .findByUserAndPromotion(user, promotion);
-
-            if (promotionManagerOpt.isPresent()) {
-
-                PromotionManager promotionManager = promotionManagerOpt.get();
-                promotionManager.setQuality(promotionManager.getQuality() + 1);
-                promotionManagerRepository.save(promotionManager);
-            } else {
-
-                PromotionManager newPromotionManager = new PromotionManager();
-                newPromotionManager.setUser(user);
-                newPromotionManager.setPromotion(promotion);
-                newPromotionManager.setQuality(1);
-                promotionManagerRepository.save(newPromotionManager);
-            }
-        }
     }
 }

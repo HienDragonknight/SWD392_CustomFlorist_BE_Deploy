@@ -10,6 +10,7 @@ import edu.fpt.customflorist.services.Payment.IPaymentService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 import vn.payos.type.CheckoutResponseData;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -49,33 +51,22 @@ public class PaymentController {
                 .build());
     }
 
-    @GetMapping("/vn-pay-callback")
-    public RedirectView payCallbackHandler(HttpServletRequest request) {
-        try{
-            String status = request.getParameter("vnp_ResponseCode");
-            String vnpOrderInfo = request.getParameter("vnp_OrderInfo");
-            Long orderId = Long.parseLong(vnpOrderInfo);
+    @GetMapping("/handle")
+    public void handlePayment(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, DataNotFoundException {
 
-            RedirectView redirectView = new RedirectView();
+        Long orderCode = Long.valueOf(request.getParameter("orderCode"));
+        String responseCode = request.getParameter("code");
+        String status = request.getParameter("status");
 
-            if (status.equals("00")) {
-                if(orderId != 0){
-                    paymentService.updatePayment(orderId, "COMPLETED");
-
-                    redirectView = new RedirectView("/payment-success.html");
-                    redirectView.addStaticAttribute("orderId", orderId);
-                }
-            } else {
-                if(orderId != 0 ){
-                    paymentService.updatePayment(orderId, "FAILED");
-
-                    redirectView = new RedirectView("/payment-fail.html");
-                    redirectView.addStaticAttribute("orderId", orderId);
-                }
-            }
-            return redirectView;
-        }catch (Exception e){
-            return  new RedirectView("/error.html");
+        if (responseCode.equals(responseCode) && status.equals("PAID")) {
+            paymentService.updatePayment(orderCode, PaymentStatus.COMPLETED);
+            response.sendRedirect("http://localhost:3000/checkout/success");
+//            response.sendRedirect("https://server-FE/checkout/success");
+        } else {
+            paymentService.updatePayment(orderCode, PaymentStatus.FAILED);
+            response.sendRedirect("http://localhost:3000/checkout/fail");
+//            response.sendRedirect("http://server-FE:3000/checkout/fail");
         }
     }
 

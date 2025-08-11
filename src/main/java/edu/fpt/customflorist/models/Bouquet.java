@@ -37,6 +37,9 @@ public class Bouquet {
     private String image;
 
     @Column(nullable = false)
+    private Boolean isEdit;
+
+    @Column(nullable = false)
     private Boolean isActive;
 
     @OneToMany(mappedBy = "bouquet", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
