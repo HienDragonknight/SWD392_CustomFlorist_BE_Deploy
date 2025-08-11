@@ -21,7 +21,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         SELECT o FROM Order o
         LEFT JOIN FETCH o.deliveryHistories dh
         LEFT JOIN FETCH o.orderItems oi
-        WHERE o.id = :orderId
+        WHERE o.orderId = :orderId
     """)
     Optional<Order> findByIdWithDetails(@Param("orderId") Long orderId);
 
@@ -131,5 +131,24 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("customerName") String customerName,
             Pageable pageable
     );
+
+
+    @Query("""
+    SELECT FUNCTION('YEAR', o.orderDate) AS year,
+           FUNCTION('MONTH', o.orderDate) AS month,
+           COUNT(o) AS totalOrders
+    FROM Order o
+    WHERE o.status = :status
+      AND o.orderDate BETWEEN :startDate AND :endDate
+    GROUP BY FUNCTION('YEAR', o.orderDate), FUNCTION('MONTH', o.orderDate)
+    ORDER BY year DESC, month DESC
+""")
+    List<Object[]> getMonthlyOrderCountByStatus(
+            @Param("status") Status status,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
+
 
 }

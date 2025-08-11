@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("${api.prefix}/api/v1/orders")
@@ -298,5 +299,27 @@ public class OrderController {
             );
         }
     }
+
+    @GetMapping("/stats/delivered-orders-last-12-months")
+    public ResponseEntity<?> getDeliveredOrderStatsLast12Months() {
+        try {
+            List<Map<String, Object>> stats = orderService.getDeliveredOrderStatsLast12Months();
+            return ResponseEntity.ok(
+                    ResponseObject.builder()
+                            .message("Số đơn DELIVERED trong 12 tháng gần nhất")
+                            .data(stats)
+                            .status(HttpStatus.OK)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(
+                    ResponseObject.builder()
+                            .message("Error: " + e.getMessage())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .build()
+            );
+        }
+    }
+
 
 }

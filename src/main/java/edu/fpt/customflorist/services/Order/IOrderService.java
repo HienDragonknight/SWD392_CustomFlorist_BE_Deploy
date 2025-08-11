@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 public interface IOrderService {
     Order createOrder(OrderDTO orderDTO) throws DataNotFoundException;
@@ -49,4 +51,6 @@ public interface IOrderService {
     OrderResponse convertToOrderResponse(Order order);
     OrderItemResponse convertToOrderItemResponse(OrderItem orderItem);
     OrderBouquetFlowerResponse convertToOrderBouquetFlowerResponse(OrderBouquetFlower obf);
+
+    List<Map<String, Object>> getDeliveredOrderStatsLast12Months();
 }
