@@ -195,22 +195,26 @@ public class OrderService implements IOrderService{
     }
 
     public OrderResponse convertToOrderResponse(Order order) {
+        String paymentStatus = order.getPayments().stream()
+                .findFirst()
+                .map(payment -> payment.getStatus().toString()) // nếu Enum thì toString()
+                .orElse(null);
+
         return OrderResponse.builder()
                 .orderId(order.getOrderId())
-                .userId(order.getUser().getUserId())
                 .userName(order.getUser().getName())
-                .promotionId(order.getPromotion() != null ? order.getPromotion().getPromotionId() : null)
+                .promotionCode(order.getPromotion() != null ? order.getPromotion().getPromotionCode() : null)
                 .orderDate(order.getOrderDate())
-                .status(order.getStatus().name())
                 .reason(order.getReason())
+                .status(String.valueOf(order.getStatus()))
                 .totalPrice(order.getTotalPrice())
-                .phone(order.getUser().getPhone())
                 .shippingAddress(order.getShippingAddress())
                 .isActive(order.getIsActive())
-                .orderItems(order.getOrderItems().stream().map(this::convertToOrderItemResponse).toList())
-                .deliveryHistories(order.getDeliveryHistories().stream().map(this::convertToDeliveryHistoryResponse).toList())
+                .paymentStatus(paymentStatus) // gán giá trị mới
                 .build();
     }
+
+
 
     public OrderItemResponse convertToOrderItemResponse(OrderItem orderItem) {
         return OrderItemResponse.builder()

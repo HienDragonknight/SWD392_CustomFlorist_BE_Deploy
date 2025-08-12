@@ -28,4 +28,7 @@ public class OrderResponse {
     private String reason;
     private List<OrderItemResponse> orderItems;
     private List<DeliveryHistoryResponse> deliveryHistories;
+    // Thêm mới
+    private String paymentStatus;    // từ Payment
+    private String promotionCode;    // từ Promotion
 }

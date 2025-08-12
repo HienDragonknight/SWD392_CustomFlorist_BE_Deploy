@@ -87,6 +87,27 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             Pageable pageable
     );
 
+
+
+    @Query("""
+    SELECT o.orderId,
+           o.orderDate,
+           o.status,
+           o.totalPrice,
+           p.status AS paymentStatus,
+           promo.promotionCode
+    FROM Order o
+    LEFT JOIN Payment p ON p.order = o
+    LEFT JOIN Promotion promo ON o.promotion = promo
+    WHERE (:minOrderDate IS NULL OR o.orderDate >= :minOrderDate)
+      AND (:maxOrderDate IS NULL OR o.orderDate <= :maxOrderDate)
+      AND (:status IS NULL OR o.status = :status)
+""")
+    List<Object[]> findOrdersWithPaymentAndPromotion(
+            @Param("minOrderDate") LocalDateTime minOrderDate,
+            @Param("maxOrderDate") LocalDateTime maxOrderDate,
+            @Param("status") Status status
+    );
     @Query("""
         SELECT o FROM Order o
         LEFT JOIN FETCH o.deliveryHistories dh
@@ -148,6 +169,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+
 
 
 
