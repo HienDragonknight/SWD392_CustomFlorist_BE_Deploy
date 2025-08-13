@@ -14,4 +14,5 @@ public class BouquetRequestDTO {
     private Boolean isActive;
     private List<BouquetCompositionRequestDTO> compositions;
     private Long categoryId;
+    private Boolean isEdit;
 }

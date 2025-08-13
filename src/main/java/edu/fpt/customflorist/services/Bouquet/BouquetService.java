@@ -60,6 +60,7 @@ public class BouquetService implements IBouquetService {
         bouquet.setBasePrice(bouquetDTO.getPrice());
         bouquet.setImage(bouquetDTO.getImageUrl());
         bouquet.setIsActive(bouquetDTO.getIsActive());
+        bouquet.setIsEdit(bouquetDTO.getIsEdit());
         Category category = categoryRepository.findById(bouquetDTO.getCategoryId()).orElseThrow(
                 () -> new DataNotFoundException("Category not found with id: " + bouquetDTO.getCategoryId())
         );
