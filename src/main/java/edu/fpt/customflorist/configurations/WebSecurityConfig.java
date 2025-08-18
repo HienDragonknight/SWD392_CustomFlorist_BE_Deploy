@@ -75,6 +75,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                             .permitAll()
 
                             .requestMatchers(HttpMethod.GET, String.format("%s/api/v1/auth/**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.OPTIONS, String.format("%s/api/v1/auth/**", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.GET, String.format("%s/api/v1/auth/**", apiPrefix)).authenticated()
 
                             .requestMatchers(HttpMethod.GET, String.format("/auth/**")).permitAll()
@@ -176,13 +177,15 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                     @Override
                     public void customize(CorsConfigurer<HttpSecurity> httpSecurityCorsConfigurer) {
                         CorsConfiguration configuration = new CorsConfiguration();
-                        configuration.setAllowedOrigins(List.of("*", "https://yourflorist.vercel.app","http://localhost:3000", "http://localhost:4300", "http://localhost:4200"));
+                        configuration.setAllowedOrigins(List.of("https://yourflorist.vercel.app", "http://localhost:3000", "http://localhost:4300", "http://localhost:4200"));
                         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                         configuration.setAllowedHeaders(Arrays.asList(
                                 "Authorization", "authorization", "content-type", "x-auth-token", "accept",
                                 "access-control-request-method", "access-control-request-headers"
                         ));
                         configuration.setExposedHeaders(List.of("Authorization", "x-auth-token"));
+                        configuration.setAllowCredentials(true);
+                        configuration.setMaxAge(3600L); // Cache preflight for 1 hour
                         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                         source.registerCorsConfiguration("/**", configuration);
                         httpSecurityCorsConfigurer.configurationSource(source);
