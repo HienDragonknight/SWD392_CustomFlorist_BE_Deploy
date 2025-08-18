@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class FeedbackResponse {
@@ -16,6 +17,7 @@ public class FeedbackResponse {
     private LocalDateTime createdAt;
     private Boolean isActive;
     private Long userId;
+    private String userName;  // Added userName field
     private Long bouquetId;
     private Long orderItemId;
 
@@ -27,6 +29,7 @@ public class FeedbackResponse {
                 feedback.getCreatedAt(),
                 feedback.getIsActive(),
                 feedback.getUser().getUserId(),
+                feedback.getUser().getName(),  // Added userName
                 feedback.getBouquet().getBouquetId(),
                 feedback.getOrderItem().getOrderItemId()
         );
