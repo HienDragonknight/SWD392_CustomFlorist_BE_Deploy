@@ -28,6 +28,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference
     private Order order;
 
     @Column(nullable = false)
@@ -40,6 +41,7 @@ public class OrderItem {
     private Boolean isActive;
 
     @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonBackReference
     private List<OrderBouquetFlower> orderBouquetFlowers = new ArrayList<>();
 
 }

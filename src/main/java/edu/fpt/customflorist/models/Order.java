@@ -1,5 +1,6 @@
 package edu.fpt.customflorist.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.fpt.customflorist.models.Enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,12 +50,15 @@ public class Order {
     private Boolean isActive;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Set<Payment> payments = new HashSet<>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<OrderItem> orderItems = new HashSet<>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<DeliveryHistory> deliveryHistories = new HashSet<>();
 
 }

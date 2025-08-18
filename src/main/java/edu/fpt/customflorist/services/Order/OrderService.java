@@ -204,16 +204,37 @@ public class OrderService implements IOrderService{
                     .orElse(null);
         }
 
+        // Convert order items
+        List<OrderItemResponse> orderItemResponses = new ArrayList<>();
+        if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+            orderItemResponses = order.getOrderItems().stream()
+                    .map(this::convertToOrderItemResponse)
+                    .toList();
+        }
+
+        // Convert delivery histories
+        List<DeliveryHistoryResponse> deliveryHistoryResponses = new ArrayList<>();
+        if (order.getDeliveryHistories() != null && !order.getDeliveryHistories().isEmpty()) {
+            deliveryHistoryResponses = order.getDeliveryHistories().stream()
+                    .map(this::convertToDeliveryHistoryResponse)
+                    .toList();
+        }
+
         return OrderResponse.builder()
                 .orderId(order.getOrderId())
+                .userId(order.getUser() != null ? order.getUser().getUserId() : null)
                 .userName(order.getUser() != null ? order.getUser().getName() : null)
+                .promotionId(order.getPromotion() != null ? order.getPromotion().getPromotionId() : null)
                 .promotionCode(order.getPromotion() != null ? order.getPromotion().getPromotionCode() : null)
                 .orderDate(order.getOrderDate())
                 .reason(order.getReason())
                 .status(order.getStatus() != null ? String.valueOf(order.getStatus()) : null)
                 .totalPrice(order.getTotalPrice())
+                .phone(order.getUser() != null ? order.getUser().getPhone() : null)
                 .shippingAddress(order.getShippingAddress())
                 .isActive(order.getIsActive())
+                .orderItems(orderItemResponses)
+                .deliveryHistories(deliveryHistoryResponses)
                 .paymentStatus(paymentStatus)
                 .build();
     }
@@ -221,6 +242,18 @@ public class OrderService implements IOrderService{
 
 
     public OrderItemResponse convertToOrderItemResponse(OrderItem orderItem) {
+        // Build product info from bouquet data
+        OrderItemResponse.ProductInfo productInfo = null;
+        if (orderItem.getBouquet() != null) {
+            productInfo = OrderItemResponse.ProductInfo.builder()
+                    .id(orderItem.getBouquet().getBouquetId())
+                    .name(orderItem.getBouquet().getName())
+                    .price(orderItem.getBouquet().getBasePrice())
+                    .image(orderItem.getBouquet().getImage())
+                    .category(orderItem.getBouquet().getCategory() != null ? orderItem.getBouquet().getCategory().getName() : "Bouquets")
+                    .build();
+        }
+
         return OrderItemResponse.builder()
                 .orderItemId(orderItem.getOrderItemId())
                 .bouquetId(orderItem.getBouquet() != null ? orderItem.getBouquet().getBouquetId() : null)
@@ -231,6 +264,7 @@ public class OrderService implements IOrderService{
                 .bouquetFlowers(orderItem.getOrderBouquetFlowers() != null ? 
                     orderItem.getOrderBouquetFlowers().stream().map(this::convertToOrderBouquetFlowerResponse).toList() : 
                     new ArrayList<>())
+                .product(productInfo)
                 .build();
     }
 
