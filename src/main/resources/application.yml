@@ -88,7 +88,7 @@ PayOS:
   api-key: f17566c7-9bf2-4e4b-b1f5-1c6da8348977
   checksum-key: 14c6e47012d01fc3388bd62a2d19859499a020db7f724f1926aea2524177fd0a
   url: https://api.payos.vn/v1/payments
-  return-url: http://localhost:8080/custom-florist/api/v1/payment/handle
-  cancel-url: http://localhost:8080/custom-florist/api/v1/payment/handle
-#  return-url: https://server-cua-toan/custom-florist/api/v1/payment/handle
-#  cancel-url: https://server-cua-toan/custom-florist/api/v1/payment/handle
+#  return-url: http://localhost:8080/custom-florist/api/v1/payment/handle
+#  cancel-url: http://localhost:8080/custom-florist/api/v1/payment/handle
+  return-url: https://flourist-gkf7c9aefxcxb4ck.eastasia-01.azurewebsites.net/custom-florist/api/v1/payment/handle
+  cancel-url: https://flourist-gkf7c9aefxcxb4ck.eastasia-01.azurewebsites.net/custom-florist/api/v1/payment/handle

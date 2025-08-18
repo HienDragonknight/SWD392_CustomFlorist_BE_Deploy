@@ -108,10 +108,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("maxOrderDate") LocalDateTime maxOrderDate,
             @Param("status") Status status
     );
-    @Query("""
-        SELECT o FROM Order o
+    @Query(
+            value = """
+        SELECT DISTINCT o FROM Order o
         LEFT JOIN FETCH o.deliveryHistories dh
         LEFT JOIN FETCH o.orderItems oi
+        LEFT JOIN FETCH o.payments p
         WHERE o.isActive = true
         AND o.user.userId = :userId
         AND (:minOrderDate IS NULL OR o.orderDate >= :minOrderDate)
@@ -119,7 +121,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         AND (:minPrice IS NULL OR o.totalPrice >= :minPrice)
         AND (:maxPrice IS NULL OR o.totalPrice <= :maxPrice)
         AND (:status IS NULL OR o.status = :status)
-    """)
+    """,
+            countQuery = """
+        SELECT COUNT(o) FROM Order o
+        WHERE o.isActive = true
+        AND o.user.userId = :userId
+        AND (:minOrderDate IS NULL OR o.orderDate >= :minOrderDate)
+        AND (:maxOrderDate IS NULL OR o.orderDate <= :maxOrderDate)
+        AND (:minPrice IS NULL OR o.totalPrice >= :minPrice)
+        AND (:maxPrice IS NULL OR o.totalPrice <= :maxPrice)
+        AND (:status IS NULL OR o.status = :status)
+    """
+    )
     Page<Order> findActiveByFilters(
             @Param("userId") Long userId,
             @Param("minOrderDate") LocalDateTime minOrderDate,

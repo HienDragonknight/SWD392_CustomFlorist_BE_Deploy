@@ -61,11 +61,11 @@ public class PaymentController {
 
         if (responseCode.equals(responseCode) && status.equals("PAID")) {
             paymentService.updatePayment(orderCode, PaymentStatus.COMPLETED);
-            response.sendRedirect("http://localhost:3000/checkout/success");
+            response.sendRedirect("http://yourflorist.vercel.app/checkout/success");
 //            response.sendRedirect("https://server-FE/checkout/success");
         } else {
             paymentService.updatePayment(orderCode, PaymentStatus.FAILED);
-            response.sendRedirect("http://localhost:3000/checkout/fail");
+            response.sendRedirect("http://yourflorist.vercel.app/checkout/fail");
 //            response.sendRedirect("http://server-FE:3000/checkout/fail");
         }
     }
