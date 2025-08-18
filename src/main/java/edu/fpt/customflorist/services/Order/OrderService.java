@@ -196,22 +196,25 @@ public class OrderService implements IOrderService{
     }
 
     public OrderResponse convertToOrderResponse(Order order) {
-        String paymentStatus = order.getPayments().stream()
-                .findFirst()
-                .map(payment -> payment.getStatus().toString()) // nếu Enum thì toString()
-                .orElse(null);
+        String paymentStatus = null;
+        if (order.getPayments() != null && !order.getPayments().isEmpty()) {
+            paymentStatus = order.getPayments().stream()
+                    .findFirst()
+                    .map(payment -> payment.getStatus() != null ? payment.getStatus().toString() : null)
+                    .orElse(null);
+        }
 
         return OrderResponse.builder()
                 .orderId(order.getOrderId())
-                .userName(order.getUser().getName())
+                .userName(order.getUser() != null ? order.getUser().getName() : null)
                 .promotionCode(order.getPromotion() != null ? order.getPromotion().getPromotionCode() : null)
                 .orderDate(order.getOrderDate())
                 .reason(order.getReason())
-                .status(String.valueOf(order.getStatus()))
+                .status(order.getStatus() != null ? String.valueOf(order.getStatus()) : null)
                 .totalPrice(order.getTotalPrice())
                 .shippingAddress(order.getShippingAddress())
                 .isActive(order.getIsActive())
-                .paymentStatus(paymentStatus) // gán giá trị mới
+                .paymentStatus(paymentStatus)
                 .build();
     }
 
@@ -220,19 +223,21 @@ public class OrderService implements IOrderService{
     public OrderItemResponse convertToOrderItemResponse(OrderItem orderItem) {
         return OrderItemResponse.builder()
                 .orderItemId(orderItem.getOrderItemId())
-                .bouquetId(orderItem.getBouquet().getBouquetId())
-                .bouquetName(orderItem.getBouquet().getName())
+                .bouquetId(orderItem.getBouquet() != null ? orderItem.getBouquet().getBouquetId() : null)
+                .bouquetName(orderItem.getBouquet() != null ? orderItem.getBouquet().getName() : null)
                 .quantity(orderItem.getQuantity())
                 .subTotal(orderItem.getSubTotal())
                 .isActive(orderItem.getIsActive())
-                .bouquetFlowers(orderItem.getOrderBouquetFlowers().stream().map(this::convertToOrderBouquetFlowerResponse).toList())
+                .bouquetFlowers(orderItem.getOrderBouquetFlowers() != null ? 
+                    orderItem.getOrderBouquetFlowers().stream().map(this::convertToOrderBouquetFlowerResponse).toList() : 
+                    new ArrayList<>())
                 .build();
     }
 
     public OrderBouquetFlowerResponse convertToOrderBouquetFlowerResponse(OrderBouquetFlower obf) {
         return OrderBouquetFlowerResponse.builder()
-                .flowerId(obf.getFlower().getFlowerId())
-                .flowerName(obf.getFlower().getName())
+                .flowerId(obf.getFlower() != null ? obf.getFlower().getFlowerId() : null)
+                .flowerName(obf.getFlower() != null ? obf.getFlower().getName() : null)
                 .quantity(obf.getQuantity())
                 .build();
     }

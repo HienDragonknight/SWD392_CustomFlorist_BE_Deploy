@@ -162,6 +162,15 @@ public class OrderController {
     public ResponseEntity<?> getOrderById(@PathVariable Long orderId) {
         try {
             Order order = orderService.getOrderById(orderId);
+            if (order == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        ResponseObject.builder()
+                                .message("Order not found")
+                                .status(HttpStatus.NOT_FOUND)
+                                .build()
+                );
+            }
+            
             OrderResponse orderResponse = orderService.convertToOrderResponse(order);
             return ResponseEntity.ok().body(
                     ResponseObject.builder()

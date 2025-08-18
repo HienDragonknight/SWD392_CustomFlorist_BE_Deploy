@@ -21,6 +21,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         SELECT o FROM Order o
         LEFT JOIN FETCH o.deliveryHistories dh
         LEFT JOIN FETCH o.orderItems oi
+        LEFT JOIN FETCH o.payments p
+        LEFT JOIN FETCH o.user u
         WHERE o.orderId = :orderId
     """)
     Optional<Order> findByIdWithDetails(@Param("orderId") Long orderId);
@@ -66,6 +68,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     SELECT o FROM Order o
     LEFT JOIN FETCH o.deliveryHistories dh
     LEFT JOIN FETCH o.orderItems oi
+    LEFT JOIN FETCH o.payments p
     WHERE (:minOrderDate IS NULL OR o.orderDate >= :minOrderDate)
     AND (:maxOrderDate IS NULL OR o.orderDate <= :maxOrderDate)
     AND (:minPrice IS NULL OR o.totalPrice >= :minPrice)
@@ -147,6 +150,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         SELECT o FROM Order o
         LEFT JOIN FETCH o.deliveryHistories dh
         LEFT JOIN FETCH o.orderItems oi
+        LEFT JOIN FETCH o.payments p
         LEFT JOIN FETCH o.user u
         WHERE o.isActive = true
         AND (:minOrderDate IS NULL OR o.orderDate >= :minOrderDate)
