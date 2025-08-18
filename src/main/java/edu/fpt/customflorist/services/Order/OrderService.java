@@ -24,6 +24,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderService implements IOrderService{
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
