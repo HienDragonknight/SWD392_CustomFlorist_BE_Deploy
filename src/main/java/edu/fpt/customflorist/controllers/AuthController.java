@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -32,12 +31,15 @@ public class AuthController {
     @Value("${spring.security.oauth2.resourceserver.opaque-token.clientSecret}")
     private String clientSecret;
 
+    @Value("${google.oauth.redirect-uri}")
+    private String googleRedirectUri;
+
     private final IUserService userService;
 
     @GetMapping("/url")
     public ResponseEntity<UrlDto> auth() {
         String url = new GoogleAuthorizationCodeRequestUrl(clientId,
-                "http://localhost:4200",
+                googleRedirectUri,
                 Arrays.asList(
                         "email",
                         "profile",
@@ -56,7 +58,7 @@ public class AuthController {
                     clientId,
                     clientSecret,
                     code,
-                    "http://localhost:4200"
+                    googleRedirectUri
             ).execute().getAccessToken();
         } catch (IOException e) {
             System.err.println(e.getMessage());
