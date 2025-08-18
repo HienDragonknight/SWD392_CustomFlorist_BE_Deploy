@@ -23,6 +23,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -252,19 +253,27 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUserProfile(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> getCurrentUserProfile() {
         try {
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(401).body("Missing or invalid Authorization header");
-            }
-            String token = authHeader.substring(7);
-            User user = userService.getUserDetailsFromToken(token);
+            System.out.println("GET /me - Starting request");
+            
+            // Check if authentication exists in security context
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("GET /me - Authentication: " + (auth != null ? auth.getName() : "null"));
+            System.out.println("GET /me - Principal: " + (auth != null ? auth.getPrincipal().getClass().getSimpleName() : "null"));
+            
+            // Get the authenticated user from the security context (set by JWT filter)
+            User user = userService.getCurrentAuthenticatedUser();
+            System.out.println("GET /me - User retrieved: " + user.getEmail());
+            
             return ResponseEntity.ok(ResponseObject.builder()
                     .message("Fetch current user profile successfully")
                     .data(CustomerResponse.fromUser(user))
                     .status(HttpStatus.OK)
                     .build());
         } catch (Exception e) {
+            System.out.println("GET /me - Error: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
@@ -275,14 +284,10 @@ public class UserController {
     )
     @PutMapping("/me")
     public ResponseEntity<?> updateCurrentUserProfile(
-            @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody UpdateUserDTO updateUserDTO) {
         try {
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(401).body("Missing or invalid Authorization header");
-            }
-            String token = authHeader.substring(7);
-            User user = userService.getUserDetailsFromToken(token);
+            // Get the authenticated user from the security context (set by JWT filter)
+            User user = userService.getCurrentAuthenticatedUser();
             User updatedUser = userService.updateUser(user.getUserId(), updateUserDTO);
             return ResponseEntity.ok(ResponseObject.builder()
                     .message("User profile updated successfully")

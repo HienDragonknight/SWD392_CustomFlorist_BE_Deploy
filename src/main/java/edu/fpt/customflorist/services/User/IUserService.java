@@ -24,6 +24,7 @@ public interface IUserService {
 
     User getUserById(Long userId) throws DataNotFoundException;
     User getUserDetailsFromToken(String token) throws Exception;
+    User getCurrentAuthenticatedUser() throws Exception;
     Page<User> findAll(String keyword, String role, String accountStatus, String gender, Pageable pageable) throws Exception;
 
     void resetPassword(Long userId, String oldPassword, String newPassword)

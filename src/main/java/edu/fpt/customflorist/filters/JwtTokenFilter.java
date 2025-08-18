@@ -45,20 +45,36 @@ public class JwtTokenFilter extends OncePerRequestFilter{
             }
             final String token = authHeader.substring(7);
             final String username = jwtTokenUtil.extractUserName(token);
+            
+            System.out.println("JWT Filter - Token: " + token.substring(0, Math.min(20, token.length())) + "...");
+            System.out.println("JWT Filter - Username: " + username);
+            
             if (username != null
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
-                User userDetails = (User) userDetailsService.loadUserByUsername(username);
+                try {
+                    User userDetails = (User) userDetailsService.loadUserByUsername(username);
+                    System.out.println("JWT Filter - User loaded: " + userDetails.getEmail());
 
-                if(jwtTokenUtil.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            );
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    if(jwtTokenUtil.validateToken(token, userDetails)) {
+                        System.out.println("JWT Filter - Token validated successfully");
+                        UsernamePasswordAuthenticationToken authenticationToken =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        null,
+                                        userDetails.getAuthorities()
+                                );
+                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        System.out.println("JWT Filter - Authentication set in context");
+                    } else {
+                        System.out.println("JWT Filter - Token validation failed");
+                    }
+                } catch (Exception e) {
+                    System.out.println("JWT Filter - Error loading user: " + e.getMessage());
+                    e.printStackTrace();
                 }
+            } else {
+                System.out.println("JWT Filter - Username is null or authentication already exists");
             }
 
             filterChain.doFilter(request, response); //enable bypass

@@ -84,9 +84,23 @@ public class JwtTokenUtils {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        String phoneNumber = extractUserName(token);
-        return (phoneNumber.equals(userDetails.getUsername()))
-                && !isTokenExpired(token);
+        try {
+            String username = extractUserName(token);
+            boolean notExpired = !isTokenExpired(token);
+            boolean usernameMatches = username.equals(userDetails.getUsername());
+            
+            System.out.println("JWT Validation - Token username: " + username);
+            System.out.println("JWT Validation - UserDetails username: " + userDetails.getUsername());
+            System.out.println("JWT Validation - Username matches: " + usernameMatches);
+            System.out.println("JWT Validation - Token not expired: " + notExpired);
+            System.out.println("JWT Validation - Final result: " + (usernameMatches && notExpired));
+            
+            return usernameMatches && notExpired;
+        } catch (Exception e) {
+            System.out.println("JWT Validation - Error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     // Parse the expiration date from the JWT token
@@ -103,6 +117,15 @@ public class JwtTokenUtils {
         if(authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             User user = (User) authentication.getPrincipal();
             return user.getUserId();
+        } else {
+            throw new IllegalStateException("No authentication found in security context");
+        }
+    }
+
+    public static User getCurrentAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null && authentication.getPrincipal() instanceof User) {
+            return (User) authentication.getPrincipal();
         } else {
             throw new IllegalStateException("No authentication found in security context");
         }

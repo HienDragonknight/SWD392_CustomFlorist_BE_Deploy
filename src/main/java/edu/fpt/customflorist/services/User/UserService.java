@@ -213,6 +213,11 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User getCurrentAuthenticatedUser() throws Exception {
+        return jwtTokenUtil.getCurrentAuthenticatedUser();
+    }
+
+    @Override
     public Page<User> findAll(String keyword, String role, String accountStatus, String gender, Pageable pageable) throws Exception {
         return userRepository.searchUsers(keyword == null || keyword.isBlank() ? null : keyword, role, accountStatus, gender, pageable);
     }

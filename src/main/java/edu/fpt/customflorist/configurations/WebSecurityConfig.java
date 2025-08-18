@@ -85,6 +85,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                             .requestMatchers(HttpMethod.POST, String.format("%s/api/v1/users/reset-password/**", apiPrefix)).permitAll()
 
                             .requestMatchers(HttpMethod.GET, String.format("%s/api/v1/users", apiPrefix)).hasAnyRole("ADMIN", "MANAGER")
+                            .requestMatchers(HttpMethod.GET, String.format("%s/api/v1/users/me", apiPrefix)).authenticated()
+                            .requestMatchers(HttpMethod.PUT, String.format("%s/api/v1/users/me", apiPrefix)).authenticated()
                             .requestMatchers(HttpMethod.GET, String.format("%s/api/v1/users/*", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.PUT, String.format("%s/api/v1/users/*", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.PUT, String.format("%s/api/v1/users/*/password", apiPrefix)).permitAll()
