@@ -74,6 +74,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                             )
                             .permitAll()
 
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                             .requestMatchers(HttpMethod.GET, String.format("%s/api/v1/auth/**", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.OPTIONS, String.format("%s/api/v1/auth/**", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.GET, String.format("%s/api/v1/auth/**", apiPrefix)).authenticated()
@@ -82,6 +84,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
                             .requestMatchers(HttpMethod.POST, String.format("%s/api/v1/users/signup", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.POST, String.format("%s/api/v1/users/login", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.POST, String.format("%s/api/v1/login", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.POST, String.format("%s/api/v1/users/reset-password/**", apiPrefix)).permitAll()
 
                             .requestMatchers(HttpMethod.GET, String.format("%s/api/v1/users", apiPrefix)).hasAnyRole("ADMIN", "MANAGER")
@@ -179,15 +182,15 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                     @Override
                     public void customize(CorsConfigurer<HttpSecurity> httpSecurityCorsConfigurer) {
                         CorsConfiguration configuration = new CorsConfiguration();
-                        configuration.setAllowedOrigins(List.of("https://yourflorist.vercel.app", "http://localhost:3000", "http://localhost:4300", "http://localhost:4200"));
+                        configuration.setAllowedOrigins(List.of("https://yourfloristmanager.vercel.app", "https://yourflorist.vercel.app", "http://localhost:3000", "http://localhost:4300", "http://localhost:4200"));
                         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                         configuration.setAllowedHeaders(Arrays.asList(
-                                "Authorization", "authorization", "content-type", "x-auth-token", "accept",
-                                "access-control-request-method", "access-control-request-headers"
+                                "Authorization", "authorization", "Content-Type", "content-type", "x-auth-token", "accept",
+                                "Access-Control-Request-Method", "access-control-request-method", "Access-Control-Request-Headers", "access-control-request-headers"
                         ));
-                        configuration.setExposedHeaders(List.of("Authorization", "x-auth-token"));
-                        configuration.setAllowCredentials(true);
-                        configuration.setMaxAge(3600L); // Cache preflight for 1 hour
+                        configuration.setExposedHeaders(List.of("Authorization", "x-auth-token", "Content-Type"));
+                        configuration.setAllowCredentials(false);
+                        configuration.setMaxAge(86400L);
                         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                         source.registerCorsConfiguration("/**", configuration);
                         httpSecurityCorsConfigurer.configurationSource(source);

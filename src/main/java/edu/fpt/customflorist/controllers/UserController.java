@@ -31,7 +31,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("${api.prefix}/api/v1/users")
-@CrossOrigin(origins = {"*", "http://localhost:3000", "https://yourflorist.vercel.app"})
+@CrossOrigin(origins = {"*", "http://localhost:3000", "https://yourflorist.vercel.app", "https://yourfloristmanager.vercel.app"})
 public class UserController {
     private final IUserService userService;
 
